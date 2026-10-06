@@ -1,0 +1,42 @@
+server {
+
+    # Listen on port 80 inside container
+    listen 80;
+
+    # Default files nginx should look for
+    index index.php index.html;
+
+    # Server name (not important for local development)
+    server_name localhost;
+
+    # Only /public should be exposed to the web
+    root ${APP_ROOT}/public;
+
+    # Handle normal requests
+    location / {
+
+        # This is REQUIRED for Laravel routing
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    # Handle PHP files
+    location ~ \.php$ {
+
+        # Forward PHP requests to PHP-FPM container
+        fastcgi_pass app:9000;
+
+        # Default PHP file
+        fastcgi_index index.php;
+
+        # Standard FastCGI parameters
+        include fastcgi_params;
+
+        # Full path to executed PHP file (${APP_ROOT}/public/index.php) 
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+    }
+
+    # Deny access to hidden files (like .env, .git, etc.)
+    location ~ /\. {
+        deny all;
+    }
+}

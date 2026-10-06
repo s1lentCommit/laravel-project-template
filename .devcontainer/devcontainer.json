@@ -1,0 +1,47 @@
+{
+    "name": "Laravel Dev Container",
+    "dockerComposeFile": "../docker-compose.dev.yml",
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "shutdownAction": "stopCompose",
+
+    "postCreateCommand": "composer install && npm install",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "ms-vscode-remote.remote-wsl",
+                "ms-vscode-remote.remote-containers",
+                "bmewburn.vscode-intelephense-client",
+                "xdebug.php-pack",
+                "bradlc.vscode-tailwindcss",
+                "stivo.tailwind-fold",
+                "onecentlin.laravel-extension-pack"
+            ],
+
+            "settings": {
+                "editor.defaultFormatter": "esbenp.prettier-vscode",
+                "editor.formatOnSave": true,
+
+                "eslint.run": "onType",
+
+                "editor.tabSize": 2,
+                "editor.insertSpaces": true,
+                "editor.detectIndentation": false,
+
+                "files.eol": "\n",
+
+                "files.watcherExclude": {
+                    "**/.git/objects/**": true,
+                    "**/.git/subtree-cache/**": true,
+                    "**/.hg/store/**": true,
+                    "**/.git/**": true,
+                    "**/node_modules/**": true,
+                    "**/.vscode/**": true
+                }
+            }
+        }
+    }
+}

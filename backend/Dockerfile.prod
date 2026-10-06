@@ -1,0 +1,71 @@
+FROM php:8.3-fpm
+
+# Install system packages
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    unzip \
+    zip \
+    nodejs \
+    npm \
+    netcat-openbsd \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev
+
+# Install PHP extensions required by Laravel
+RUN docker-php-ext-install \
+    pdo \
+    pdo_mysql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    gd
+
+# Install Composer
+COPY --from=docker.io/library/composer:latest /usr/bin/composer /usr/bin/composer
+
+# Set working directory
+WORKDIR /var/www
+
+# Copy entire Laravel application
+COPY . .
+
+# Install PHP dependencies optimized for production
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader
+
+# Install Node.js dependencies
+RUN npm ci
+
+# Build frontend assets
+RUN npm run build
+
+# Remove Vite dev hot reload file
+RUN rm -f public/hot
+
+# Remove node_modules after build
+RUN rm -rf node_modules
+
+# Create Laravel writable directories
+RUN mkdir -p \
+    storage/framework/cache \
+    storage/framework/sessions \
+    storage/framework/views \
+    storage/logs \
+    bootstrap/cache
+
+# Fix permissions
+RUN chown -R www-data:www-data storage bootstrap/cache && \
+    chmod -R 775 storage bootstrap/cache
+
+# Copy the production entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+
+# Make the entrypoint script executable
+RUN chmod +x /entrypoint.sh
+
+# Start PHP-FPM
+CMD ["php-fpm"]

@@ -1,0 +1,101 @@
+services:
+  app:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+
+    # Laravel project will live here
+    working_dir: /workspace/backend
+
+    # Synchronize backend local folder into container
+    volumes:
+      - ./:/workspace
+      - ./backend/.env.dev:/workspace/backend/.env
+
+    depends_on:
+      - db
+
+    command: /entrypoint.sh
+
+    networks:
+      - laravel
+
+    restart: unless-stopped
+
+  vite:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+
+    working_dir: /workspace/backend
+
+    volumes:
+      - ./:/workspace
+      - ./backend/.env.dev:/workspace/backend/.env
+
+    # Publish container port 5173  for Vite dev server
+    ports:
+      - '5173:5173'
+
+    command: sh -c "npm install && npm run dev -- --host"
+
+    depends_on:
+      - app
+
+    networks:
+      - laravel
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+
+    environment:
+      APP_ROOT: /workspace/backend
+
+    # Publish container port 80 to localhost:8000
+    ports:
+      - '8000:80'
+
+    # Give nginx access to project files Prefer container
+    volumes:
+      - ./:/workspace
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template
+
+    depends_on:
+      - app
+
+    networks:
+      - laravel
+
+    restart: unless-stopped
+
+  db:
+    image: docker.io/library/mysql:8.0
+
+    # Load MySQL credentials from .env.dev file
+    env_file:
+      - ./backend/.env.dev
+
+    # Use native password plugin for compatibility with Laravel's MySQL driver
+    command: --default-authentication-plugin=mysql_native_password
+
+    # Expose MySQL for DBeaver debugging
+    ports:
+      - '3306:3306'
+
+    volumes:
+      - dbdata:/var/lib/mysql
+
+    networks:
+      - laravel
+
+    restart: unless-stopped
+
+# Used for persistent MySQL data, managed by Docker
+volumes:
+  dbdata:
+
+# Internal Docker network for container communication
+networks:
+  laravel:
