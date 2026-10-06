@@ -11,6 +11,7 @@ services:
     volumes:
       - ./:/workspace
       - ./backend/.env.dev:/workspace/backend/.env
+      - backend_vendor:/workspace/backend/vendor
 
     depends_on:
       - db
@@ -32,6 +33,7 @@ services:
     volumes:
       - ./:/workspace
       - ./backend/.env.dev:/workspace/backend/.env
+      - backend_vendor:/workspace/backend/vendor
 
     # Publish container port 5173  for Vite dev server
     ports:
@@ -95,6 +97,7 @@ services:
 # Used for persistent MySQL data, managed by Docker
 volumes:
   dbdata:
+  backend_vendor:
 
 # Internal Docker network for container communication
 networks:

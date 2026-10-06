@@ -27,7 +27,10 @@ RUN docker-php-ext-install \
 COPY --from=docker.io/library/composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
-WORKDIR /workspace
+WORKDIR /workspace/backend
+
+# Tell Git this mounted project directory is safe
+RUN git config --global --add safe.directory /workspace/backend
 
 # Copy entire Laravel application
 COPY . .
