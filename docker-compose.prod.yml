@@ -4,18 +4,22 @@ services:
       context: ./backend
       dockerfile: Dockerfile.prod
 
-    # Laravel project will live here
     working_dir: /var/www
 
     env_file:
       - ./backend/.env.prod
 
+    environment:
+      APP_DIR: /var/www
+
     volumes:
       - ./backend/.env.prod:/var/www/.env
       - public_data:/var/www/public
+      - storage_data:/var/www/storage/app/public
 
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
     command: /entrypoint.sh
 
@@ -34,12 +38,13 @@ services:
 
     # Publish container port 80 to localhost:8040 on the server
     ports:
-      - "127.0.0.1:8040:80"
+      - '127.0.0.1:8040:80'
 
     # Give nginx access to project files Prefer container
     volumes:
-      - public_data:/var/www/public
-      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template
+      - public_data:/var/www/public:ro
+      - storage_data:/var/www/storage/app/public:ro
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
 
     depends_on:
       - app
@@ -50,17 +55,24 @@ services:
     restart: unless-stopped
 
   db:
-    image: docker.io/library/mysql:8.0
+    image: mysql:8.0
 
     # Load MySQL credentials from .env file
     env_file:
       - ./backend/.env.prod
 
-    # Use native password plugin for compatibility with Laravel's MySQL driver
-    command: --default-authentication-plugin=mysql_native_password
-
     volumes:
       - dbdata:/var/lib/mysql
+
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'mysqladmin ping -h localhost -u root -p$$MYSQL_ROOT_PASSWORD || exit 1',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
     networks:
       - laravel
@@ -71,6 +83,7 @@ services:
 volumes:
   dbdata:
   public_data:
+  storage_data:
 
 # Internal Docker network for container communication
 networks:

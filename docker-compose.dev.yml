@@ -7,6 +7,9 @@ services:
     # Laravel project will live here
     working_dir: /workspace/backend
 
+    environment:
+      APP_DIR: /workspace/backend
+
     # Synchronize backend local folder into container
     volumes:
       - ./:/workspace
