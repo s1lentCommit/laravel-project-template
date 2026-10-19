@@ -21,6 +21,10 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode",
         "editor.formatOnSave": true,
 
+        "[blade]": {
+          "editor.defaultFormatter": "shufo.vscode-blade-formatter"
+        },
+
         "eslint.run": "onType",
 
         "editor.tabSize": 2,
