@@ -102,7 +102,7 @@ services:
 
     # Expose Adminer for database management
     ports:
-      - '127.0.0.1:8080:8080'
+      - '8080:8080'
 
     # Set the default server for Adminer to connect to the MySQL database
     environment:
