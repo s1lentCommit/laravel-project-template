@@ -97,6 +97,23 @@ services:
 
     restart: unless-stopped
 
+  adminer:
+    image: adminer:latest
+
+    # Expose Adminer for database management
+    ports:
+      - '127.0.0.1:8080:8080'
+
+    # Set the default server for Adminer to connect to the MySQL database
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+
+    depends_on:
+      - db
+
+    networks:
+      - laravel
+
 # Used for persistent MySQL data, managed by Docker
 volumes:
   dbdata:
