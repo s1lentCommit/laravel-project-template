@@ -14,9 +14,8 @@ Route::get('/tasks', function () {
     // Retrieve all tasks from the database using Eloquent ORM.
     $tasks = \App\Models\Task::latest()->get();
 
-    return view('index', [
-        'tasks' => $tasks
-    ]);
+    // Return the view for displaying tasks, passing the tasks data.
+    return view('index', ['tasks' => $tasks]);
 })->name('tasks.index');
 
 // Route to display a single task based on its ID.
