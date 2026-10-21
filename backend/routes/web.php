@@ -71,14 +71,10 @@ Route::get('/tasks', function ()  use($tasks){
 })->name('tasks.index');
 
 // Route to display a single task based on its ID.
-Route::get('/tasks/{id}', function ($id) use($tasks) {
-    // Find the task with the given ID.
-    $task = collect($tasks)->firstWhere('id', $id);
+Route::get('/tasks/{id}', function ($id)  {
 
-    // If the task is not found, return a 404 response.
-    if (!$task) {
-        abort(Response::HTTP_NOT_FOUND);
-    }
+    // Find the task by its ID using Eloquent ORM.
+    $task = \App\Models\Task::find($id);
 
     // Return the view for displaying a single task, passing the task data.
     return view('show', ['task' => $task]);

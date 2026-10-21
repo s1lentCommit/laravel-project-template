@@ -150,6 +150,12 @@ La configurazione viene caricata automaticamente da:
 
 I dati vengono mantenuti tramite Docker Volumes.
 
+## Per creare un nuovo modello con migration:
+
+```sh
+php artisan make:model Task -m
+```
+
 # Deploy in Produzione
 
 Il deploy in produzione è completamente automatizzato tramite GitHub Actions.
