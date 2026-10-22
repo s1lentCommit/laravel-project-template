@@ -47,7 +47,8 @@ Route::post('/tasks', function (Request $request) {
     $task = Task::create($data);
 
     // Redirect to the tasks index route after successful creation.
-    return redirect()->route('tasks.show', ['id' => $task->id]);
+    return redirect()->route('tasks.show', ['id' => $task->id])
+        ->with('success', 'Task created successfully!');
 })->name('tasks.store');
 
 // Fallback route to handle any undefined routes.
