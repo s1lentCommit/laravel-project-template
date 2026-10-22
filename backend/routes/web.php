@@ -23,11 +23,21 @@ Route::get('/tasks', function () {
 // Route to display the form for creating a new task.
 Route::view('/tasks/create', 'create')->name('tasks.create');
 
+// Route to display the form for editing an existing task based on its ID.
+Route::get('/tasks/{id}/edit', function ($id) {
+
+    // Find the task by its ID using Eloquent ORM.
+    $task = Task::findOrFail($id);
+
+    // Return the view for displaying a single task, passing the task data.
+    return view('edit', ['task' => $task]);
+})->name('tasks.edit');
+
 // Route to display a single task based on its ID.
 Route::get('/tasks/{id}', function ($id) {
 
     // Find the task by its ID using Eloquent ORM.
-    $task = \App\Models\Task::findOrFail($id);
+    $task = Task::findOrFail($id);
 
     // Return the view for displaying a single task, passing the task data.
     return view('show', ['task' => $task]);
@@ -50,6 +60,26 @@ Route::post('/tasks', function (Request $request) {
     return redirect()->route('tasks.show', ['id' => $task->id])
         ->with('success', 'Task created successfully!');
 })->name('tasks.store');
+
+
+// Route to handle the submission of the edit task form.
+Route::put('/tasks/{id}', function (Request $request, $id) {
+
+    // Validate the incoming request data.
+    $data = $request->validate([
+        'title' => 'required|string|max:30',
+        'description' => 'required|string',
+        'long_description' => 'nullable|string',
+    ]);
+
+    // Find the task by its ID using Eloquent ORM and update it with the validated data.
+    $task = Task::findOrFail($id);
+    $task->update($data);
+
+    // Redirect to the tasks index route after successful creation.
+    return redirect()->route('tasks.show', ['id' => $task->id])
+        ->with('success', 'Task updated successfully!');
+})->name('tasks.update');
 
 // Fallback route to handle any undefined routes.
 Route::fallback(function () {
